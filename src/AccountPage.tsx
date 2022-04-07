@@ -1,4 +1,4 @@
-import { Avatar, Center, Group, Paper, Title } from "@mantine/core";
+import { Avatar, Center, Code, Group, Paper, Title } from "@mantine/core";
 
 export function AccountPage() {
   return (

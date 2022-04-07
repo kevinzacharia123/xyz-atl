@@ -10,10 +10,13 @@ import {
   Stack,
   Popover,
   Box,
+  Button,
+  Space,
 } from "@mantine/core";
 import { Search } from "tabler-icons-react";
 import { COI } from "./COI";
 import Fuse from "fuse.js";
+import { Link } from "react-router-dom";
 import { SetStateAction, useState } from "react";
 const fuse = new Fuse(COI[0] as any, {
   keys: ["ArtNo", "Name", "ArtDesc"],
@@ -54,7 +57,7 @@ export function HomePage() {
         width={"75vw"}
         positionDependencies={[data]}
       >
-        <ScrollArea sx={{ maxHeight: 250 }}>
+        <ScrollArea sx={{ height: "30vh" }}>
           <Group direction="column" grow>
             {data.map((item, i) => (
               <Paper key={i} p="md">
@@ -64,6 +67,25 @@ export function HomePage() {
           </Group>
         </ScrollArea>
       </Popover>
+      <Space></Space>
+      <Group position="center" direction="column">
+        <Group>
+          <Button<typeof Link> component={Link} to="lawyers" size="xl">
+            Lawyers
+          </Button>
+          <Button<typeof Link> component={Link} to="law-colleges" size="xl">
+            Law Colleges
+          </Button>
+        </Group>
+        <Group>
+          <Button<typeof Link> component={Link} to="pil" size="xl">
+            PIL Instructions
+          </Button>
+          <Button<typeof Link> component={Link} to="preamble" size="xl">
+            Preamble
+          </Button>
+        </Group>
+      </Group>
     </Stack>
   );
 }

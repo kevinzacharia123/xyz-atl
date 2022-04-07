@@ -24,6 +24,7 @@ import {
   Divider,
   Card,
   Image,
+  ScrollArea,
 } from "@mantine/core";
 import { useColorScheme } from "@mantine/hooks";
 import {
@@ -56,6 +57,79 @@ import { LawyersPage } from "./LawyersPage";
 import { AccountPage } from "./AccountPage";
 import { PILPage } from "./PILPage";
 import { LawCollegesPage } from "./LawCollegesPage";
+
+const pages = [
+  {
+    route: "/",
+    label: "Home",
+    icon: (
+      <ThemeIcon variant="light">
+        <Home></Home>
+      </ThemeIcon>
+    ),
+    el: <HomePage></HomePage>,
+  },
+  {
+    route: "/account",
+    label: "Account",
+    icon: (
+      <ThemeIcon variant="light">
+        <User></User>
+      </ThemeIcon>
+    ),
+    el: <AccountPage></AccountPage>,
+  },
+  {
+    route: "/lawyers",
+    label: "Lawyers",
+    icon: (
+      <ThemeIcon variant="light">
+        <Certificate></Certificate>
+      </ThemeIcon>
+    ),
+    el: <LawyersPage></LawyersPage>,
+  },
+  {
+    route: "/law-colleges",
+    label: "Law Colleges",
+    icon: (
+      <ThemeIcon variant="light">
+        <School></School>
+      </ThemeIcon>
+    ),
+    el: <LawCollegesPage></LawCollegesPage>,
+  },
+  {
+    route: "/pil",
+    label: "PIL Instruction",
+    icon: (
+      <ThemeIcon variant="light">
+        <Writing></Writing>
+      </ThemeIcon>
+    ),
+    el: <PILPage></PILPage>,
+  },
+  {
+    route: "/preamble",
+    label: "Preamble",
+    icon: (
+      <ThemeIcon variant="light">
+        <Files></Files>
+      </ThemeIcon>
+    ),
+    el: (
+      <Center sx={{ height: "100%" }}>
+        <Card>
+          <Image
+            src={
+              "https://i1.wp.com/apnagyaan.com/wp-content/uploads/2019/08/bloombergquint_2019-01_4149e735-a84a-4e50-ab1e-edf7059f72ba_PREAMBLE_1.jpg?fit=1200%2C1800&ssl=1"
+            }
+          ></Image>
+        </Card>
+      </Center>
+    ),
+  },
+];
 
 function DrawerLink(props: {
   children?: React.ReactNode;
@@ -124,7 +198,7 @@ function App() {
     setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
 
   return (
-    <MantineProvider theme={{ colorScheme: colorScheme }}>
+    <MantineProvider theme={{ colorScheme: colorScheme, primaryColor: "blue" }}>
       <MyShell
         header={
           <Header height={60} p={0}>
@@ -132,43 +206,21 @@ function App() {
               <Group>
                 <Avatar src="./lawyer.png"></Avatar>
                 <Paper>
-                  <Title>Themis</Title>
+                  <Title>Quicklaw</Title>
                 </Paper>
               </Group>
-              <ActionIcon p={"md"}>
-                <Burger
-                  opened={false}
-                  onClick={() => setNavOpened(!navOpened)}
-                ></Burger>
-              </ActionIcon>
+              <Burger
+                opened={false}
+                onClick={() => setNavOpened(!navOpened)}
+              ></Burger>
             </Group>
           </Header>
         }
       >
         <Routes>
-          <Route path="/" element={<HomePage></HomePage>}></Route>
-          <Route path="/lawyers" element={<LawyersPage></LawyersPage>}></Route>
-          <Route path="/account" element={<AccountPage></AccountPage>}></Route>
-          <Route path="/pil" element={<PILPage></PILPage>}></Route>
-          <Route
-            path="/law-colleges"
-            element={<LawCollegesPage></LawCollegesPage>}
-          ></Route>
-          <Route
-            path="/preamble"
-            element={
-              <Center sx={{ height: "100%" }}>
-                <Card>
-                  <Image
-                    height={"calc(100vh - 120px)"}
-                    src={
-                      "https://i1.wp.com/apnagyaan.com/wp-content/uploads/2019/08/bloombergquint_2019-01_4149e735-a84a-4e50-ab1e-edf7059f72ba_PREAMBLE_1.jpg?fit=1200%2C1800&ssl=1"
-                    }
-                  ></Image>
-                </Card>
-              </Center>
-            }
-          ></Route>
+          {pages.map((_, i) => (
+            <Route path={_.route} element={_.el} key={i}></Route>
+          ))}
         </Routes>
       </MyShell>
       <Drawer
@@ -182,68 +234,42 @@ function App() {
                 <Sun color="yellow"></Sun>
               )}
             </ActionIcon>
+            <Title order={2}>Menu</Title>
           </Group>
         }
         opened={navOpened}
         onClose={() => setNavOpened(!navOpened)}
         padding="sm"
+        styles={{
+          drawer: {
+            display: "flex",
+            flexDirection: "column",
+          },
+        }}
       >
-        <Group direction="column">
-          <DrawerLink
-            icon={
-              <ThemeIcon variant="light">
-                <Home></Home>
-              </ThemeIcon>
-            }
-            label="Home"
-            path="/"
-          ></DrawerLink>
-          <DrawerLink
-            icon={
-              <ThemeIcon variant="light">
-                <User></User>
-              </ThemeIcon>
-            }
-            label="Account"
-            path="/account"
-          ></DrawerLink>
-          <DrawerLink
-            icon={
-              <ThemeIcon variant="light">
-                <Certificate></Certificate>
-              </ThemeIcon>
-            }
-            label="Lawyers"
-            path="/lawyers"
-          ></DrawerLink>
-          <DrawerLink
-            icon={
-              <ThemeIcon variant="light">
-                <School></School>
-              </ThemeIcon>
-            }
-            label="Law Colleges"
-            path="/law-colleges"
-          ></DrawerLink>
-          <DrawerLink
-            icon={
-              <ThemeIcon variant="light">
-                <Writing></Writing>
-              </ThemeIcon>
-            }
-            label="PIL Instructions"
-            path="/pil"
-          ></DrawerLink>
-          <DrawerLink
-            icon={
-              <ThemeIcon variant="light">
-                <Files></Files>
-              </ThemeIcon>
-            }
-            label="Preamble"
-            path="/preamble"
-          ></DrawerLink>
-        </Group>
+        {/* <ScrollArea sx={{ height: "100%", maxHeight: "100%" }}>
+          <Group sx={{ height: "100%" }} direction="column">
+            {pages.map((_) => (
+              <DrawerLink
+                icon={_.icon}
+                label={_.label}
+                path={_.route}
+              ></DrawerLink>
+            ))}
+          </Group>
+        </ScrollArea> */}
+        <ScrollArea sx={{ height: "100%" }}>
+          <Group direction="column">
+            {pages.map((_, i) => (
+              <DrawerLink
+                key={i}
+                icon={_.icon}
+                label={_.label}
+                path={_.route}
+              ></DrawerLink>
+            ))}
+          </Group>
+        </ScrollArea>
       </Drawer>
     </MantineProvider>
   );
