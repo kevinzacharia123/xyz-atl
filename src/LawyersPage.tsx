@@ -20,11 +20,18 @@ import {
   Chips,
   Chip,
   MultiSelect,
+  Button,
 } from "@mantine/core";
 import fuse from "fuse.js";
 import { faker } from "@faker-js/faker";
 import { useState } from "react";
-import { AdjustmentsHorizontal, Search } from "tabler-icons-react";
+import {
+  AdjustmentsHorizontal,
+  Message,
+  Search,
+  Send,
+  Video,
+} from "tabler-icons-react";
 
 const courts = ["High Court", "Supreme Court", "District Court"];
 const states = {
@@ -1307,6 +1314,7 @@ interface Profile {
   qualifications: string;
   caseType: string;
   fees: number;
+  pfp: string;
 }
 
 function createFakeData(profile: number): any {
@@ -1333,14 +1341,56 @@ function createFakeData(profile: number): any {
             : court == "High Court"
             ? Math.floor(Math.random() * 1000 + 300) * 100
             : Math.floor(Math.random() * 5000 + 1000) * 100,
+        pfp: faker.image.avatar(),
       };
     });
 }
 
 const data = createFakeData(199);
 
+function debounce(func: any, timeout = 300) {
+  let timer: any;
+  return (...args: any) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func(...args);
+    }, timeout);
+  };
+}
+
+function filterFn(profile: Profile, filters: any) {
+  let _ = true;
+  if (
+    !(
+      profile.fees >= filters.feesRange[0] &&
+      profile.fees <= filters.feesRange[1]
+    )
+  ) {
+    _ = false;
+  }
+  if (
+    !(
+      profile.yearsPracticed >= filters.practicedRange[0] &&
+      profile.yearsPracticed <= filters.practicedRange[1]
+    )
+  ) {
+    _ = false;
+  }
+  if (filters.court != "All") {
+    if (filters.court) _ = false;
+  }
+  !_ && console.log(profile);
+  return _;
+}
+
 export function LawyersPage() {
-  const [drawerOpened, setDrawerOpened] = useState(false);
+  const [filtersOpened, setFiltersOpened] = useState(false);
+  const [chatOpened, setChatOpened] = useState(false);
+  const [filterData, setFilterData] = useState({
+    feesRange: [5000, 500000],
+    practicedRange: [2, 50],
+    court: "All",
+  });
   return (
     <>
       <Group p="md">
@@ -1356,7 +1406,7 @@ export function LawyersPage() {
         ></Input>
         <ActionIcon
           sx={{ width: "fit-content" }}
-          onClick={() => setDrawerOpened(true)}
+          onClick={() => setFiltersOpened(true)}
         >
           <AdjustmentsHorizontal></AdjustmentsHorizontal>
         </ActionIcon>
@@ -1375,39 +1425,50 @@ export function LawyersPage() {
             <Text>Some Recommended Lawyers</Text>
           </Paper>
         </Center>
-        {data.slice(0, 49).map((_: Profile, i: number) => {
-          return (
-            <Center key={i}>
-              <Card sx={{ maxWidth: 650, width: "100%" }}>
-                {/* <Image src={faker.image.avatar()}></Image> */}
-                <Group position="apart">
-                  <Box p={"md"}>
-                    <Text weight={700}>{`Name: ${_.name}`}</Text>
-                    <Text weight={700}>{`Court: ${_.court}`}</Text>
-                    <Text weight={700}>{`Contact No: ${_.contactNo}`}</Text>
-                    <Text weight={700}>{`Gmail ID: ${_.gmailID}`}</Text>
-                    <Text
-                      weight={700}
-                    >{`Years Practiced: ${_.yearsPracticed}`}</Text>
-                    <Text
-                      weight={700}
-                    >{`Qualification: ${_.qualifications}`}</Text>
-                    <Text weight={700}>{`Fees: ₹ ${_.fees}`}</Text>
-                    <Text weight={700}>{`Case Type: ${_.caseType}`}</Text>
-                  </Box>
-                  <Group position="center">
-                    <Avatar size={200} src={faker.image.avatar()}></Avatar>
+        {data
+          .slice(0, 49)
+          .filter((_: Profile) => filterFn(_, filterData))
+          .map((_: Profile, i: number) => {
+            return (
+              <Center key={i}>
+                <Card sx={{ maxWidth: 660, width: "100%" }}>
+                  {/* <Image src={faker.image.avatar()}></Image> */}
+                  <Group position="apart">
+                    <Box p={"md"}>
+                      <Text weight={700}>{`Name: ${_.name}`}</Text>
+                      <Text weight={700}>{`Court: ${_.court}`}</Text>
+                      <Text weight={700}>{`Contact No: ${_.contactNo}`}</Text>
+                      <Text weight={700}>{`Gmail ID: ${_.gmailID}`}</Text>
+                      <Text
+                        weight={700}
+                      >{`Years Practiced: ${_.yearsPracticed}`}</Text>
+                      <Text
+                        weight={700}
+                      >{`Qualification: ${_.qualifications}`}</Text>
+                      <Text weight={700}>{`Fees: ₹ ${_.fees}`}</Text>
+                      <Text weight={700}>{`Case Type: ${_.caseType}`}</Text>
+                    </Box>
+                    <Group position="center">
+                      <Avatar size={200} src={_.pfp}></Avatar>
+                    </Group>
                   </Group>
-                </Group>
-              </Card>
-            </Center>
-          );
-        })}
+                  <Group px={"md"}>
+                    <ActionIcon size={"xl"} onClick={() => setChatOpened(true)}>
+                      <Message></Message>
+                    </ActionIcon>
+                    <ActionIcon size={"xl"}>
+                      <Video></Video>
+                    </ActionIcon>
+                  </Group>
+                </Card>
+              </Center>
+            );
+          })}
       </Group>
       <Drawer
-        opened={drawerOpened}
+        opened={filtersOpened}
         onClose={function (): void {
-          setDrawerOpened(false);
+          setFiltersOpened(false);
         }}
         title={
           <Group>
@@ -1428,22 +1489,38 @@ export function LawyersPage() {
               max={500000}
               sx={{ width: "100%" }}
               step={100}
+              value={filterData.feesRange as any}
+              onChange={(e) => setFilterData({ ...filterData, feesRange: e })}
             ></RangeSlider>
           </InputWrapper>
           <InputWrapper
             label={<Text size="lg">Years Practiced</Text>}
             sx={{ width: "100%" }}
           >
-            <RangeSlider min={2} max={50} sx={{ width: "100%" }}></RangeSlider>
+            <RangeSlider
+              min={2}
+              max={50}
+              sx={{ width: "100%" }}
+              value={filterData.practicedRange as any}
+              onChange={(e) =>
+                setFilterData({ ...filterData, practicedRange: e })
+              }
+            ></RangeSlider>
           </InputWrapper>
           <InputWrapper
             label={<Text size="lg">Court</Text>}
             sx={{ width: "100%" }}
           >
-            <Chips>
+            <Chips
+              value={filterData.court as any}
+              onChange={(e) => {
+                setFilterData({ ...filterData, court: e as any });
+              }}
+            >
               <Chip value={"District Court"}>District Court</Chip>
               <Chip value={"High Court"}>High Court</Chip>
               <Chip value={"Supreme Court"}>Supreme Court</Chip>
+              <Chip value={"All"}>All</Chip>
             </Chips>
           </InputWrapper>
           <InputWrapper
@@ -1470,6 +1547,58 @@ export function LawyersPage() {
           </InputWrapper>
         </Group>
       </Drawer>
+      <ChatDrawer opened={chatOpened} onClose={() => setChatOpened(false)} />
     </>
+  );
+}
+
+function ChatDrawer(props: { opened: boolean; onClose: () => void }) {
+  const [chatInput, setChatInput] = useState("");
+  const [msgs, setMsgs] = useState<string[]>([]);
+  return (
+    <Drawer
+      opened={props.opened}
+      onClose={props.onClose}
+      title={<Title>Chat</Title>}
+      padding="md"
+      size="xl"
+      styles={{
+        drawer: {
+          display: "flex",
+          flexDirection: "column",
+        },
+      }}
+    >
+      <Group direction="column" sx={{ height: "100%", width: "100%" }}>
+        <ScrollArea sx={{ height: 0, flexGrow: 1, width: "100%" }}>
+          <Group direction="column" p="sm" grow sx={{ width: "100%" }}>
+            {msgs.map((_, i) => (
+              <Paper p="md" key={i} shadow="md" color="red">
+                <Title order={4}>{`You: ${_}`}</Title>
+              </Paper>
+            ))}
+          </Group>
+        </ScrollArea>
+        <Group sx={{ width: "100%" }} p="sm">
+          <Input
+            sx={{ flexGrow: 1 }}
+            value={chatInput}
+            onChange={(e: any) => {
+              setChatInput(e.target.value);
+            }}
+          ></Input>
+          <ActionIcon
+            size={"lg"}
+            variant="filled"
+            color="blue"
+            onClick={() => {
+              setMsgs([...msgs, chatInput]);
+            }}
+          >
+            <Send></Send>
+          </ActionIcon>
+        </Group>
+      </Group>
+    </Drawer>
   );
 }

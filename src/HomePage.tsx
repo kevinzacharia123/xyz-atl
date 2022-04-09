@@ -85,6 +85,11 @@ export function HomePage() {
             Preamble
           </Button>
         </Group>
+        <Group>
+          <Button<typeof Link> component={Link} to="forum" size="xl">
+            Forum
+          </Button>
+        </Group>
       </Group>
     </Stack>
   );

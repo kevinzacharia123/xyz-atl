@@ -33,6 +33,8 @@ import {
   Circle,
   Files,
   Home,
+  Message,
+  Messages,
   MoonStars,
   School,
   Search,
@@ -57,6 +59,8 @@ import { LawyersPage } from "./LawyersPage";
 import { AccountPage } from "./AccountPage";
 import { PILPage } from "./PILPage";
 import { LawCollegesPage } from "./LawCollegesPage";
+import { ChatPage } from "./ChatPage";
+import { PreamblePage } from "./PreamblePage";
 
 const pages = [
   {
@@ -117,17 +121,17 @@ const pages = [
         <Files></Files>
       </ThemeIcon>
     ),
-    el: (
-      <Center sx={{ height: "100%" }}>
-        <Card>
-          <Image
-            src={
-              "https://i1.wp.com/apnagyaan.com/wp-content/uploads/2019/08/bloombergquint_2019-01_4149e735-a84a-4e50-ab1e-edf7059f72ba_PREAMBLE_1.jpg?fit=1200%2C1800&ssl=1"
-            }
-          ></Image>
-        </Card>
-      </Center>
+    el: <PreamblePage></PreamblePage>,
+  },
+  {
+    route: "/forum",
+    label: "Forum",
+    icon: (
+      <ThemeIcon variant="light">
+        <Messages></Messages>
+      </ThemeIcon>
     ),
+    el: <ChatPage></ChatPage>,
   },
 ];
 
@@ -170,20 +174,36 @@ function MyShell(props: {
   header?: React.ReactNode;
 }) {
   return (
-    <Box
+    <Group
+      // component={ScrollArea}
+      grow
       sx={(theme) => ({
         backgroundColor:
           theme.colorScheme === "dark"
             ? theme.colors.dark[8]
             : theme.colors.gray[2],
-        minHeight: `100vh`,
+        height: `100vh`,
+        width: "100wv",
       })}
     >
-      <Group sx={{ height: "100%" }} direction="column" grow spacing={0}>
-        {props.header}
-        <Box>{props.children}</Box>
+      <Group sx={{ height: "100%" }} direction="column" spacing={0}>
+        <Group grow sx={{ width: "100%", height: "fit-content" }}>
+          {props.header}
+        </Group>
+        <ScrollArea
+          sx={{
+            flexGrow: 1,
+            height: 0,
+            width: "100%",
+            display: "flex",
+          }}
+        >
+          <Group sx={{ height: "100%" }} direction="column" grow>
+            {props.children}
+          </Group>
+        </ScrollArea>
       </Group>
-    </Box>
+    </Group>
   );
 }
 
@@ -247,17 +267,6 @@ function App() {
           },
         }}
       >
-        {/* <ScrollArea sx={{ height: "100%", maxHeight: "100%" }}>
-          <Group sx={{ height: "100%" }} direction="column">
-            {pages.map((_) => (
-              <DrawerLink
-                icon={_.icon}
-                label={_.label}
-                path={_.route}
-              ></DrawerLink>
-            ))}
-          </Group>
-        </ScrollArea> */}
         <ScrollArea sx={{ height: "100%" }}>
           <Group direction="column">
             {pages.map((_, i) => (
